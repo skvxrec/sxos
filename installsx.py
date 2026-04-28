@@ -31,8 +31,10 @@ def main():
     root_part = ask("root partition (e.g. /dev/sda2): ")
 
     # format
-    run(f"mkfs.fat -F32 {boot_part}")
-    run(f"mkfs.ext4 {root_part}")
+    if ask(f"format {boot_part} as FAT32? [y/n]: ").lower() == 'y':
+        run(f"mkfs.fat -F32 {boot_part}")
+    if ask(f"format {root_part} as ext4? [y/n]: ").lower() == 'y':
+        run(f"mkfs.ext4 {root_part}")
 
     # mount
     run(f"mount {root_part} {MOUNT}")
