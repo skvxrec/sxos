@@ -4,7 +4,8 @@ import os
 import sys
 import getpass
 
-STAGE3_URL = "https://distfiles.gentoo.org/releases/amd64/autobuilds/current-stage3-amd64-musl-openrc/"
+STAGE3_BASE = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
+STAGE3_LATEST = STAGE3_BASE + "latest-stage3-amd64-musl-openrc.txt"
 MOUNT = "/mnt/gentoo"
 
 def run(cmd, check=True):
@@ -55,16 +56,17 @@ def main():
 
     # stage3
     print("\ndownloading stage3...")
-    run(f"wget -q -O /tmp/stage3list {STAGE3_URL}")
-    import re
-    with open("/tmp/stage3list") as f:
-        content = f.read()
-    match = re.search(r'(stage3-amd64-musl-openrc-\d+T\d+Z\.tar\.xz)', content)
-    if not match:
-        print("could not find stage3 filename")
-        sys.exit(1)
-    stage3_name = match.group(1)
-    run(f"wget -O {MOUNT}/stage3.tar.xz {STAGE3_URL}{stage3_name}")
+    run(f"wget -q -O /tmp/stage3latest {STAGE3_LATEST}")
+    with open("/tmp/stage3latest") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                stage3_path = line.split()[0]
+                break
+        else:
+            print("could not find stage3 filename")
+            sys.exit(1)
+    run(f"wget -O {MOUNT}/stage3.tar.xz {STAGE3_BASE}{stage3_path}")
     run(f"tar xpvf {MOUNT}/stage3.tar.xz --xattrs-include='*.*' --numeric-owner -C {MOUNT}")
     run(f"rm {MOUNT}/stage3.tar.xz")
 
