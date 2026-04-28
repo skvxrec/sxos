@@ -5,7 +5,6 @@ Gentoo-based distro with clang, musl, OpenRC and a simple installer.
 
 ## features
 - clang as the only compiler
-- musl libc
 - OpenRC init
 - simple installer on Python (installsx.py) — installs doas and GRUB by default
 

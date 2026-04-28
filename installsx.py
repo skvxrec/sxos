@@ -5,7 +5,7 @@ import sys
 import getpass
 
 STAGE3_BASE = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
-STAGE3_LATEST = STAGE3_BASE + "latest-stage3-amd64-musl-openrc.txt"
+STAGE3_LATEST = STAGE3_BASE + "latest-stage3-amd64-openrc.txt"
 MOUNT = "/mnt/gentoo"
 
 def run(cmd, check=True):
@@ -74,7 +74,7 @@ def main():
     make_conf = f"""COMMON_FLAGS="-O{opt} -pipe"
 CFLAGS="${{COMMON_FLAGS}}"
 CXXFLAGS="${{COMMON_FLAGS}}"
-CHOST="x86_64-pc-linux-musl"
+CHOST="x86_64-pc-linux-gnu"
 MAKEOPTS="-j{jobs}"
 CC=clang
 CXX=clang++
@@ -96,7 +96,7 @@ USE="openrc"
     chroot("emerge-webrsync")
 
     # install clang + grub
-    chroot("emerge --ask=n sys-devel/clang sys-boot/grub app-admin/doas")
+    chroot("emerge --ask=n llvm-core/clang sys-boot/grub app-admin/doas")
     remove_gcc = ask("remove gcc? [y/n]: ").lower() == 'y'
     if remove_gcc:
         chroot("emerge --ask=n --unmerge sys-devel/gcc")
