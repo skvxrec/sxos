@@ -60,7 +60,7 @@ def main():
     with open("/tmp/stage3latest") as f:
         for line in f:
             line = line.strip()
-            if line and not line.startswith('#'):
+            if ".tar.xz" in line and not line.startswith('#'):
                 stage3_path = line.split()[0]
                 break
         else:
