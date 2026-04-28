@@ -93,6 +93,9 @@ USE="openrc"
 
     # install clang + grub
     chroot("emerge --ask=n sys-devel/clang sys-boot/grub app-admin/doas")
+    remove_gcc = ask("remove gcc? [y/n]: ").lower() == 'y'
+    if remove_gcc:
+        chroot("emerge --ask=n --unmerge sys-devel/gcc")
 
     # grub
     chroot("grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=sxOS")
