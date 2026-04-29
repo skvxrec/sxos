@@ -1,7 +1,7 @@
 # sxOS
 *you will KISS this distro*
 
-Gentoo-based distro with clang, musl, OpenRC and a simple installer.
+Distro with clang, OpenRC, custom package manager and a simple installer.
 
 ## features
 - clang as the only compiler
