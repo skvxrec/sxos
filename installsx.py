@@ -5,7 +5,7 @@ import sys
 import getpass
 
 STAGE3_BASE = "https://distfiles.gentoo.org/releases/amd64/autobuilds/"
-STAGE3_LATEST = STAGE3_BASE + "latest-stage3-amd64-openrc.txt"
+STAGE3_LATEST = STAGE3_BASE + "latest-stage3-amd64-musl-openrc.txt"
 MOUNT = "/mnt/gentoo"
 
 def run(cmd, check=True):
@@ -70,17 +70,12 @@ def main():
     run(f"tar xpvf {MOUNT}/stage3.tar.xz --xattrs-include='*.*' --numeric-owner -C {MOUNT}")
     run(f"rm {MOUNT}/stage3.tar.xz")
 
-    # make.conf
+    # make.conf (без clang пока не установлен)
     make_conf = f"""COMMON_FLAGS="-O{opt} -pipe"
 CFLAGS="${{COMMON_FLAGS}}"
 CXXFLAGS="${{COMMON_FLAGS}}"
-CHOST="x86_64-pc-linux-gnu"
+CHOST="x86_64-pc-linux-musl"
 MAKEOPTS="-j{jobs}"
-CC=clang
-CXX=clang++
-AR=llvm-ar
-NM=llvm-nm
-RANLIB=llvm-ranlib
 USE="openrc"
 """
     with open(f"{MOUNT}/etc/portage/make.conf", "w") as f:
@@ -97,9 +92,11 @@ USE="openrc"
 
     # install clang + grub
     chroot("emerge --ask=n llvm-core/clang sys-boot/grub app-admin/doas")
-    remove_gcc = ask("remove gcc? [y/n]: ").lower() == 'y'
-    if remove_gcc:
-        chroot("emerge --ask=n --unmerge sys-devel/gcc")
+
+    # добавить clang в make.conf после установки
+    if ask("set clang as compiler in make.conf? [y/n]: ").lower() == 'y':
+        with open(f"{MOUNT}/etc/portage/make.conf", "a") as f:
+            f.write("\nCC=clang\nCXX=clang++\nAR=llvm-ar\nNM=llvm-nm\nRANLIB=llvm-ranlib\n")
 
     # grub
     chroot("grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=sxOS")
