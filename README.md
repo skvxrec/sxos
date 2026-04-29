@@ -7,15 +7,17 @@ Gentoo-based distro with clang, musl, OpenRC and a simple installer.
 - clang as the only compiler
 - OpenRC init
 - simple installer on Python (installsx.py) — installs doas and GRUB by default
+- custom package manager inspired by KISS Linux
 
 ## planned
 - custom kernel (BFQ, KSM patches)
-- custom stage3 (clang + doas preinstalled)
+- musl version
+- custom init based on sinit
 
 ## install
 ```
 python3 installsx.py
 ```
 
-## based on
-Gentoo Linux
+## built on
+From scratch
