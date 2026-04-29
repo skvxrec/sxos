@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+import subprocess
+import os
+import sys
+import shutil
+
+REPO = os.path.expanduser("~/.sxpkg/repo")
+DB = "/var/lib/sxpkg"
+BUILD_DIR = "/tmp/sxpkg-build"
+
+def run(cmd, cwd=None):
+    subprocess.run(cmd, shell=True, check=True, cwd=cwd)
+
+def installed(pkg):
+    return os.path.exists(f"{DB}/{pkg}")
+
+def install(pkg, visited=None):
+    if visited is None:
+        visited = set()
+    if pkg in visited:
+        return
+    visited.add(pkg)
+
+    if installed(pkg):
+        print(f"==> {pkg} already installed")
+        return
+
+    pkg_dir = f"{REPO}/{pkg}"
+    if not os.path.exists(pkg_dir):
+        print(f"error: package '{pkg}' not found in repo")
+        sys.exit(1)
+
+    depends = f"{pkg_dir}/depends"
+    if os.path.exists(depends):
+        with open(depends) as f:
+            for dep in f.read().splitlines():
+                dep = dep.strip()
+                if dep:
+                    install(dep, visited)
+
+    print(f"==> installing {pkg}")
+    work = f"{BUILD_DIR}/{pkg}"
+    os.makedirs(work, exist_ok=True)
+
+    with open(f"{pkg_dir}/sources") as f:
+        for url in f.read().splitlines():
+            url = url.strip()
+            if url:
+                run(f"wget -q --show-progress -P {work} {url}")
+
+    for f in os.listdir(work):
+        if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
+            run(f"tar xf {work}/{f} -C {work}")
+
+    subdirs = [d for d in os.listdir(work) if os.path.isdir(f"{work}/{d}")]
+    src = f"{work}/{subdirs[0]}" if subdirs else work
+
+    dest = f"{DB}/{pkg}"
+    os.makedirs(dest, exist_ok=True)
+    run(f"sh {pkg_dir}/build {dest}", cwd=src)
+
+    run(f"cp -r {dest}/. /")
+    print(f"==> {pkg} installed")
+
+def remove(pkg):
+    if not installed(pkg):
+        print(f"error: {pkg} is not installed")
+        sys.exit(1)
+    shutil.rmtree(f"{DB}/{pkg}")
+    print(f"==> {pkg} removed")
+
+def list_installed():
+    if not os.path.exists(DB):
+        print("no packages installed")
+        return
+    for pkg in sorted(os.listdir(DB)):
+        print(pkg)
+
+def search(query):
+    if not os.path.exists(REPO):
+        print("error: repo not found")
+        sys.exit(1)
+    for pkg in sorted(os.listdir(REPO)):
+        if query.lower() in pkg.lower():
+            print(pkg)
+
+def usage():
+    print("usage: sxpkg <command> [package]")
+    print("commands:")
+    print("  install <pkg>  install a package")
+    print("  remove <pkg>   remove a package")
+    print("  list           list installed packages")
+    print("  search <query> search packages in repo")
+
+def main():
+    if len(sys.argv) < 2:
+        usage()
+        sys.exit(1)
+
+    cmd = sys.argv[1]
+
+    if cmd == "install":
+        if len(sys.argv) < 3:
+            print("error: specify a package")
+            sys.exit(1)
+        if os.geteuid() != 0:
+            print("error: run as root")
+            sys.exit(1)
+        install(sys.argv[2])
+    elif cmd == "remove":
+        if len(sys.argv) < 3:
+            print("error: specify a package")
+            sys.exit(1)
+        if os.geteuid() != 0:
+            print("error: run as root")
+            sys.exit(1)
+        remove(sys.argv[2])
+    elif cmd == "list":
+        list_installed()
+    elif cmd == "search":
+        if len(sys.argv) < 3:
+            print("error: specify a query")
+            sys.exit(1)
+        search(sys.argv[2])
+    else:
+        usage()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
