@@ -60,13 +60,39 @@ def install(pkg, visited=None):
     os.makedirs(dest, exist_ok=True)
     run(f"cd {src} && sh {pkg_dir}/build {dest}")
 
+    files = []
+    for root, dirs, filenames in os.walk(dest):
+        for filename in filenames:
+            filepath = os.path.join(root, filename)
+            system_path = "/" + os.path.relpath(filepath, dest)
+            files.append(system_path)
+
     run(f"cp -r {dest}/. /")
+
+    with open(f"{DB}/{pkg}/files", "w") as f:
+        f.write("\n".join(files) + "\n")
+
+    setuid = f"{pkg_dir}/setuid"
+    if os.path.exists(setuid):
+        with open(setuid) as f:
+            for line in f.read().splitlines():
+                line = line.strip()
+                if line and os.path.isfile(line):
+                    os.chmod(line, os.stat(line).st_mode | 0o4755)
+
     print(f"==> {pkg} installed")
 
 def remove(pkg):
     if not installed(pkg):
         print(f"error: {pkg} is not installed")
         sys.exit(1)
+    files_list = f"{DB}/{pkg}/files"
+    if os.path.exists(files_list):
+        with open(files_list) as f:
+            for line in f.read().splitlines():
+                line = line.strip()
+                if line and os.path.isfile(line):
+                    os.remove(line)
     shutil.rmtree(f"{DB}/{pkg}")
     print(f"==> {pkg} removed")
 
