@@ -58,7 +58,7 @@ def install(pkg, visited=None):
 
     dest = f"{DB}/{pkg}"
     os.makedirs(dest, exist_ok=True)
-    run(f"sh {pkg_dir}/build {dest}", cwd=src)
+    run(f"cd {src} && sh {pkg_dir}/build {dest}")
 
     run(f"cp -r {dest}/. /")
     print(f"==> {pkg} installed")
