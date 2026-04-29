@@ -47,7 +47,7 @@ def install(pkg, visited=None):
         for url in f.read().splitlines():
             url = url.strip()
             if url:
-                run(f"wget -q --show-progress -P {work} {url}")
+                run(f"wget -P {work} {url}")
 
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
