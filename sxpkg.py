@@ -3,6 +3,7 @@ import subprocess
 import os
 import sys
 import shutil
+import urllib.request
 
 REPO = os.path.expanduser("~/.sxpkg/repo")
 REPO_URL = "https://github.com/skvxrec/sxpkg-repo"
@@ -47,7 +48,9 @@ def install(pkg, visited=None):
         for url in f.read().splitlines():
             url = url.strip()
             if url:
-                run(f"wget --no-check-certificate -P {work} {url}")
+                dest = f"{work}/{url.split('/')[-1]}"
+                print(f"    fetching {url.split('/')[-1]}")
+                urllib.request.urlretrieve(url, dest)
 
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
