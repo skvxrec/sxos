@@ -19,5 +19,5 @@ Gentoo-based distro with clang, musl, OpenRC and a simple installer.
 python3 installsx.py
 ```
 
-## built on
+## built 
 From scratch
