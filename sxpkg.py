@@ -5,6 +5,7 @@ import sys
 import shutil
 
 REPO = os.path.expanduser("~/.sxpkg/repo")
+REPO_URL = "https://github.com/skvxrec/sxpkg-repo"
 DB = "/var/lib/sxpkg"
 BUILD_DIR = "/tmp/sxpkg-build"
 
@@ -76,6 +77,16 @@ def list_installed():
     for pkg in sorted(os.listdir(DB)):
         print(pkg)
 
+def sync():
+    if os.path.exists(REPO):
+        print("==> updating repo")
+        run(f"git -C {REPO} pull")
+    else:
+        print("==> cloning repo")
+        os.makedirs(os.path.dirname(REPO), exist_ok=True)
+        run(f"git clone {REPO_URL} {REPO}")
+    print("==> done")
+
 def search(query):
     if not os.path.exists(REPO):
         print("error: repo not found")
@@ -87,6 +98,7 @@ def search(query):
 def usage():
     print("usage: sxpkg <command> [package]")
     print("commands:")
+    print("  sync           sync package repo")
     print("  install <pkg>  install a package")
     print("  remove <pkg>   remove a package")
     print("  list           list installed packages")
@@ -99,7 +111,9 @@ def main():
 
     cmd = sys.argv[1]
 
-    if cmd == "install":
+    if cmd == "sync":
+        sync()
+    elif cmd == "install":
         if len(sys.argv) < 3:
             print("error: specify a package")
             sys.exit(1)
