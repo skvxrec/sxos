@@ -6,7 +6,8 @@ import shutil
 
 REPO = os.path.expanduser("~/.sxpkg/repo")
 REPO_URL = "https://github.com/skvxrec/sxpkg-repo"
-DB = "/var/lib/sxpkg"
+ROOT = os.environ.get("SXROOT", "")
+DB = ROOT + "/var/lib/sxpkg"
 BUILD_DIR = "/tmp/sxpkg-build"
 
 def run(cmd, cwd=None):
@@ -68,7 +69,7 @@ def install(pkg, visited=None):
             system_path = "/" + os.path.relpath(filepath, dest)
             files.append(system_path)
 
-    run(f"cp -r {dest}/. /")
+    run(f"cp -r {dest}/. {ROOT}/")
 
     with open(f"{DB}/{pkg}/files", "w") as f:
         f.write("\n".join(files) + "\n")
