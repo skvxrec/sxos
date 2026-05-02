@@ -1,5 +1,5 @@
 # sxOS
-*you will KISS this distro*
+*suffering from source*
 
 Distro with clang, OpenRC, custom package manager and a simple installer.
 
