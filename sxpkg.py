@@ -148,7 +148,8 @@ def main():
         if os.geteuid() != 0:
             print("error: run as root")
             sys.exit(1)
-        install(sys.argv[2])
+        for pkg in sys.argv[2:]:
+            install(pkg)
     elif cmd == "remove":
         if len(sys.argv) < 3:
             print("error: specify a package")
