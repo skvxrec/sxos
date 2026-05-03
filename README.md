@@ -25,7 +25,7 @@ Distro built from scratch with a custom package manager and a simple installer.
 ## install
 Download the latest stage from [releases](https://github.com/skvxrec/sxos/releases). Stage2 is recommended.
 
-Installation is done manually like LFS — download the stage, then set up GRUB, Linux kernel, and other system components by hand, as they are not yet in the package manager.
+Boot any live ISO (e.g. Arch Linux), then extract the stage, set up GRUB and the kernel manually like LFS. There is no sxOS ISO yet — use whatever live environment you have.
 
 Automated installer is planned but not ready yet.
 
