@@ -25,7 +25,43 @@ Distro built from scratch with a custom package manager and a simple installer.
 ## install
 Download the latest stage from [releases](https://github.com/skvxrec/sxos/releases). Stage2 is recommended.
 
-Boot any live ISO (e.g. Arch Linux), then extract the stage, set up GRUB and the kernel manually like LFS. There is no sxOS ISO yet — use whatever live environment you have.
+Boot any live ISO (e.g. Arch Linux), extract the stage to your partition, chroot into it and install the kernel and bootloader:
+
+```sh
+sxpkg install linux
+sxpkg install grub
+```
+
+Then:
+
+```sh
+# UEFI
+mount /dev/nvmeXnXpX /boot/efi
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=sxOS
+
+# BIOS
+grub-install /dev/sdX
+
+# create /boot/grub/grub.cfg manually (grub-mkconfig is not supported yet)
+mkdir -p /boot/grub
+cat > /boot/grub/grub.cfg << EOF
+set default=0
+set timeout=5
+
+menuentry "sxOS" {
+    set root=(hd0,1)
+    linux /boot/vmlinuz root=/dev/sda1 rw
+}
+EOF
+```
+
+Adjust `(hd0,1)` and `root=/dev/sda1` to match your partition.
+
+Don't forget to set a root password before rebooting, otherwise the system will drop into an emergency shell:
+
+```sh
+passwd root
+```
 
 Automated installer is planned but not ready yet.
 

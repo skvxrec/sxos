@@ -1,0 +1,49 @@
+#!/bin/sh
+# mkinitramfs - minimal initramfs generator for sxOS
+# usage: mkinitramfs <output.img>
+
+set -e
+
+OUT=${1:-/boot/initramfs.img}
+TMP=$(mktemp -d)
+
+cleanup() { rm -rf "$TMP"; }
+trap cleanup EXIT
+
+# basic directory structure
+mkdir -p "$TMP"/{bin,dev,proc,sys,mnt,etc}
+
+# copy busybox and create symlinks
+cp /bin/busybox "$TMP/bin/busybox"
+for cmd in sh mount umount switch_root mdev sleep echo; do
+    ln -s busybox "$TMP/bin/$cmd"
+done
+
+# init script
+cat > "$TMP/init" << 'EOF'
+#!/bin/sh
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev 2>/dev/null || mdev -s
+
+# parse root= from cmdline
+ROOT=$(cat /proc/cmdline | tr ' ' '\n' | grep '^root=' | cut -d= -f2-)
+
+if [ -z "$ROOT" ]; then
+    echo "ERROR: no root= on kernel cmdline"
+    exec sh
+fi
+
+echo "Mounting $ROOT..."
+if ! mount "$ROOT" /mnt; then
+    echo "ERROR: failed to mount $ROOT"
+    exec sh
+fi
+
+exec switch_root /mnt /sbin/init
+EOF
+chmod +x "$TMP/init"
+
+# pack
+(cd "$TMP" && find . | cpio -H newc -o 2>/dev/null | gzip > "$OUT")
+echo "initramfs written to $OUT"
