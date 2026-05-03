@@ -14,11 +14,12 @@ trap cleanup EXIT
 mkdir -p "$TMP/bin" "$TMP/dev" "$TMP/proc" "$TMP/sys" "$TMP/mnt" "$TMP/etc"
 
 # copy libraries for busybox
-mkdir -p "$TMP/lib" "$TMP/lib64" "$TMP/usr/lib"
-cp /lib/ld-linux-x86-64.so.2 "$TMP/lib64/" 2>/dev/null || true
-cp /usr/lib/ld-linux-x86-64.so.2 "$TMP/lib64/" 2>/dev/null || true
-cp /usr/lib/libc.so.6 "$TMP/usr/lib/" 2>/dev/null || true
-cp /lib/libc.so.6 "$TMP/lib/" 2>/dev/null || true
+mkdir -p "$TMP/usr/lib"
+ln -s usr/lib "$TMP/lib"
+ln -s usr/lib "$TMP/lib64"
+cp /usr/lib/ld-linux-x86-64.so.2 "$TMP/usr/lib/"
+cp /usr/lib/libc.so.6 "$TMP/usr/lib/"
+cp /usr/lib/libm.so.6 "$TMP/usr/lib/" 2>/dev/null || true
 
 # copy busybox and create symlinks
 cp /bin/busybox "$TMP/bin/busybox"
