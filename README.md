@@ -23,6 +23,8 @@ Distro built from scratch with a custom package manager and a simple installer.
 **stage2** — gcc, make, git, python, doas, sxpkg (package manager). This is the recommended starting point.
 
 ## install
+Download the latest stage from [releases](https://github.com/skvxrec/sxos/releases). Stage2 is recommended.
+
 Installation is done manually like LFS — download the stage, then set up GRUB, Linux kernel, and other system components by hand, as they are not yet in the package manager.
 
 Automated installer is planned but not ready yet.
