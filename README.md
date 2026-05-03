@@ -1,23 +1,25 @@
 # sxOS
 *suffering from source*
 
-Distro with clang, OpenRC, custom package manager and a simple installer.
+Distro built from scratch with a custom package manager and a simple installer.
 
 ## features
-- clang as the only compiler
+- gcc as the system compiler
 - OpenRC init
-- simple installer on Python (installsx.py) — installs doas and GRUB by default
-- custom package manager inspired by KISS Linux
+- simple installer on Python (installsx.py)
+- custom package manager inspired by KISS Linux (sxpkg)
+- doas instead of sudo
 
 ## planned
+- bootable ISO (WIP, not working yet)
 - custom kernel (BFQ, KSM patches)
 - musl version
 - custom init based on sinit
 
 ## install
-```
-python3 installsx.py
-```
+Installation is done manually like LFS — download the stage, then set up GRUB, Linux kernel, and other system components by hand, as they are not yet in the package manager.
 
-## built 
+Automated installer is planned but not ready yet.
+
+## built
 From scratch
