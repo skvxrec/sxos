@@ -16,6 +16,12 @@ Distro built from scratch with a custom package manager and a simple installer.
 - musl version
 - custom init based on sinit
 
+## stages
+
+**stage1** — base system with a broken clang (not usable as a compiler)
+
+**stage2** — gcc, make, git, python, doas, sxpkg (package manager). This is the recommended starting point.
+
 ## install
 Installation is done manually like LFS — download the stage, then set up GRUB, Linux kernel, and other system components by hand, as they are not yet in the package manager.
 
