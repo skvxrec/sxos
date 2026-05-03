@@ -40,7 +40,15 @@ if ! mount "$ROOT" /mnt; then
     exec sh
 fi
 
-exec switch_root /mnt /sbin/init
+if [ -x /mnt/sbin/init ]; then
+    exec switch_root /mnt /sbin/init
+elif [ -x /mnt/bin/sh ]; then
+    echo "WARNING: no init found, dropping to shell"
+    exec switch_root /mnt /bin/sh
+else
+    echo "ERROR: no init and no shell on root"
+    exec sh
+fi
 EOF
 chmod +x "$TMP/init"
 
