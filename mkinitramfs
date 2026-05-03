@@ -11,7 +11,7 @@ cleanup() { rm -rf "$TMP"; }
 trap cleanup EXIT
 
 # basic directory structure
-mkdir -p "$TMP"/{bin,dev,proc,sys,mnt,etc}
+mkdir -p "$TMP/bin" "$TMP/dev" "$TMP/proc" "$TMP/sys" "$TMP/mnt" "$TMP/etc"
 
 # copy busybox and create symlinks
 cp /bin/busybox "$TMP/bin/busybox"
