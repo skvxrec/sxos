@@ -17,9 +17,9 @@ mkdir -p "$TMP/bin" "$TMP/dev" "$TMP/proc" "$TMP/sys" "$TMP/mnt" "$TMP/etc"
 mkdir -p "$TMP/usr/lib"
 ln -s usr/lib "$TMP/lib"
 ln -s usr/lib "$TMP/lib64"
-cp /usr/lib/ld-linux-x86-64.so.2 "$TMP/usr/lib/"
-cp /usr/lib/libc.so.6 "$TMP/usr/lib/"
-cp /usr/lib/libm.so.6 "$TMP/usr/lib/" 2>/dev/null || true
+for lib in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libresolv.so.2 libdl.so.2 libpthread.so.0; do
+    find /usr/lib /lib -name "$lib" 2>/dev/null | head -1 | xargs -I{} cp {} "$TMP/usr/lib/" || true
+done
 
 # copy busybox and create symlinks
 cp /bin/busybox "$TMP/bin/busybox"
