@@ -13,16 +13,8 @@ trap cleanup EXIT
 # basic directory structure
 mkdir -p "$TMP/bin" "$TMP/dev" "$TMP/proc" "$TMP/sys" "$TMP/mnt" "$TMP/etc"
 
-# copy libraries for busybox
-mkdir -p "$TMP/usr/lib"
-ln -s usr/lib "$TMP/lib"
-ln -s usr/lib "$TMP/lib64"
-for lib in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libresolv.so.2 libdl.so.2 libpthread.so.0; do
-    find /usr/lib /lib -name "$lib" 2>/dev/null | head -1 | xargs -I{} cp {} "$TMP/usr/lib/" || true
-done
-
-# copy busybox and create symlinks
-cp /bin/busybox "$TMP/bin/busybox"
+# copy static busybox (no libraries needed)
+cp /usr/lib/busybox-static/busybox "$TMP/bin/busybox"
 for cmd in sh mount umount switch_root mdev sleep echo cat tr grep cut ls; do
     ln -s busybox "$TMP/bin/$cmd"
 done
