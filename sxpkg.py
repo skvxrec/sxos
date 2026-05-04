@@ -13,6 +13,19 @@ BUILD_DIR = "/tmp/sxpkg-build"
 def run(cmd, cwd=None):
     subprocess.run(cmd, shell=True, check=True, cwd=cwd)
 
+def download(url, dest):
+    if shutil.which("curl"):
+        cacert = "/etc/ssl/certs/ca-certificates.crt"
+        if os.path.exists(cacert):
+            run(f"curl -fsSL --cacert {cacert} -o {dest} {url}")
+        else:
+            run(f"curl -fsSLk -o {dest} {url}")
+    elif shutil.which("wget"):
+        run(f"wget --no-check-certificate -O {dest} {url}")
+    else:
+        print("error: no downloader found (need curl or wget)")
+        sys.exit(1)
+
 def installed(pkg):
     return os.path.exists(f"{DB}/{pkg}")
 
@@ -49,7 +62,8 @@ def install(pkg, visited=None):
             url = url.strip()
             if url:
                 filename = url.split('/')[-1]
-                run(f"wget --no-check-certificate -O {work}/{filename} {url}")
+                if not os.path.exists(f"{work}/{filename}"):
+                    download(url, f"{work}/{filename}")
 
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
