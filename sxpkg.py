@@ -64,6 +64,8 @@ def install(pkg, visited=None):
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
             run(f"tar xf {work}/{f} -C {work}")
+        elif f.endswith(".zip"):
+            run(f"unzip -o {work}/{f} -d {work}")
 
     subdirs = [d for d in os.listdir(work) if os.path.isdir(f"{work}/{d}")]
     src = f"{work}/{subdirs[0]}" if subdirs else work
