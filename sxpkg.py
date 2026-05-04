@@ -15,9 +15,7 @@ def run(cmd, cwd=None):
 
 def download(url, dest):
     if shutil.which("curl"):
-        cacert = "/etc/ssl/certs/ca-certificates.crt"
-        cacert_flag = f"--cacert {cacert}" if os.path.exists(cacert) else "-k"
-        run(f"curl -fsSL {cacert_flag} -o {dest} {url}")
+        run(f"curl -fsSLk -o {dest} {url}")
     elif shutil.which("wget"):
         run(f"wget --no-check-certificate -O {dest} {url}")
     else:
