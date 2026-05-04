@@ -82,6 +82,7 @@ def install(pkg, visited=None):
             files.append(system_path)
 
     run(f"cp -r {dest}/. {ROOT}/")
+    run(f"ldconfig {ROOT}/usr/lib {ROOT}/lib {ROOT}/lib64 2>/dev/null || true")
 
     with open(f"{DB}/{pkg}/files", "w") as f:
         f.write("\n".join(files) + "\n")
