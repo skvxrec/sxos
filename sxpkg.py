@@ -49,7 +49,7 @@ def install(pkg, visited=None):
             url = url.strip()
             if url:
                 filename = url.split('/')[-1]
-                run(f"wget --no-check-certificate -O {work}/{filename} {url}")
+                run(f"curl -fsSL -o {work}/{filename} {url}")
 
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
@@ -98,6 +98,21 @@ def remove(pkg):
     shutil.rmtree(f"{DB}/{pkg}")
     print(f"==> {pkg} removed")
 
+def clean(pkg=None):
+    if pkg:
+        path = f"{BUILD_DIR}/{pkg}"
+        if os.path.exists(path):
+            shutil.rmtree(path)
+            print(f"==> cleaned {pkg}")
+        else:
+            print(f"==> nothing to clean for {pkg}")
+    else:
+        if os.path.exists(BUILD_DIR):
+            shutil.rmtree(BUILD_DIR)
+            print(f"==> cleaned {BUILD_DIR}")
+        else:
+            print("==> nothing to clean")
+
 def list_installed():
     if not os.path.exists(DB):
         print("no packages installed")
@@ -131,6 +146,7 @@ def usage():
     print("  remove <pkg>   remove a package")
     print("  list           list installed packages")
     print("  search <query> search packages in repo")
+    print("  clean [pkg]    remove build cache")
 
 def main():
     if len(sys.argv) < 2:
@@ -160,6 +176,8 @@ def main():
         remove(sys.argv[2])
     elif cmd == "list":
         list_installed()
+    elif cmd == "clean":
+        clean(sys.argv[2] if len(sys.argv) > 2 else None)
     elif cmd == "search":
         if len(sys.argv) < 3:
             print("error: specify a query")
