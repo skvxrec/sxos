@@ -49,7 +49,7 @@ def install(pkg, visited=None):
             url = url.strip()
             if url:
                 filename = url.split('/')[-1]
-                run(f"curl -fsSL -o {work}/{filename} {url}")
+                run(f"wget --no-check-certificate -O {work}/{filename} {url}")
 
     for f in os.listdir(work):
         if f.endswith((".tar.gz", ".tar.xz", ".tar.bz2", ".tar.zst")):
