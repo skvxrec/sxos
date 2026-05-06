@@ -15,7 +15,7 @@ def run(cmd, cwd=None):
 
 def download(url, dest):
     if shutil.which("curl"):
-        run(f"curl -fsSLk -o {dest} {url}")
+        run(f"curl -#Lk -o {dest} {url}")
     elif shutil.which("wget"):
         run(f"wget --no-check-certificate -O {dest} {url}")
     else:
